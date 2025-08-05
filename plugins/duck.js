@@ -1,43 +1,40 @@
-import fetch from 'node-fetch'
+import axios from 'axios';
 
-let handler = async (m, { conn, text, usedPrefix, command }) => {
-  if (!text) {
-    return m.reply(`📌 Uso correcto: *${usedPrefix + command} <texto>*\nEjemplo: *.duck goku*`)
+const handler = async (sock, m, { args }) => {
+  const query = args.join(' ');
+  if (!query) {
+    return sock.sendMessage(m.key.remoteJid, {
+      text: '🦆 Escribe algo para buscar.\n\n*Ejemplo:*\n.duck Gato con botas'
+    }, { quoted: m });
   }
+
+  await sock.sendMessage(m.key.remoteJid, {
+    text: `🔎 Buscando "${query}"...`
+  }, { quoted: m });
 
   try {
-    // Mostrar mensaje de carga
-    await m.reply('🔎 Buscando imágenes...')
+    // Usamos la API de DuckDuckGo para obtener una imagen directamente
+    const response = await axios.get(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json`);
+    const imageUrl = response.data.Image;
 
-    // Consultar a la API de Popcat
-    let res = await fetch(`https://api.popcat.xyz/imagesearch?query=${encodeURIComponent(text)}`)
-    let json = await res.json()
-
-    if (!json || json.length === 0) {
-      return m.reply('❌ No encontré resultados.')
+    if (!imageUrl) {
+      return sock.sendMessage(m.key.remoteJid, {
+        text: `❌ No encontré una imagen para "${query}".`
+      }, { quoted: m });
     }
 
-    // Armar los botones con las miniaturas
-    const sections = [{
-      title: `🌆 Resultados para: ${text}`,
-      rows: json.slice(0, 10).map((img, index) => ({
-        title: `🔹 Imagen ${index + 1}`,
-        description: img,
-        rowId: `.ver ${img}`
-      }))
-    }]
+    await sock.sendMessage(m.key.remoteJid, {
+      image: { url: `https://duckduckgo.com${imageUrl}` },
+      caption: `🦆 Resultado para: *${query}*`
+    }, { quoted: m });
 
-    // Enviar como lista con botones
-    await conn.sendList(m.chat, `✨ Resultados encontrados`, `Haz clic para ver la imagen`, `Imágenes`, sections, m)
-
-  } catch (e) {
-    console.error(e)
-    m.reply('⚠️ Ocurrió un error al buscar la imagen.')
+  } catch (error) {
+    console.error('🛑 Error en .duck:', error);
+    await sock.sendMessage(m.key.remoteJid, {
+      text: '❌ Ocurrió un error al realizar la búsqueda. Inténtalo de nuevo.'
+    }, { quoted: m });
   }
-}
+};
 
-handler.help = ['duck <texto>']
-handler.tags = ['buscar', 'imagen']
-handler.command = /^duck$/i
-
-export default handler
+handler.command = ['duck', 'duckduckgo'];
+export default handler;
