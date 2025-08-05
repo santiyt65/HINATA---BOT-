@@ -40,12 +40,13 @@ const handler = async (sock, m, { args }) => {
 
     await sock.sendMessage(m.key.remoteJid, mensaje, { quoted: m });
 
-  } catch (e) {
-    console.error('🛑 Error en .pinterest:', e);
+  } catch (error) {
+    console.error('🛑 Error en .pinterest:', error); // Log the error for debugging
     await sock.sendMessage(m.key.remoteJid, {
-      text: '❌ Error al buscar imágenes. Intentalo de nuevo más tarde.',
+      text: `❌ Error al buscar imágenes. Inténtalo de nuevo más tarde. \n\nError: ${error.message}`, // Include error message for user
     }, { quoted: m });
   }
+
 };
 
 handler.command = ['pinterest'];
