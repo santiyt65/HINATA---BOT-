@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
 const handler = async (sock, m, { args }) => {
   const texto = args.join(' ');
@@ -15,7 +14,8 @@ const handler = async (sock, m, { args }) => {
   }, { quoted: m });
 
   try {
-    const res = await axios.get(`https://api.akuari.my.id/pinterest?query=${encodeURIComponent(texto)}`);
+    // Se actualiza la API a una más estable
+    const res = await axios.get(`https://aemt.me/pinterest?query=${encodeURIComponent(texto)}`);
     const resultados = res.data.result;
 
     if (!resultados || resultados.length === 0) {
