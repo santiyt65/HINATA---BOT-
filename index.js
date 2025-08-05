@@ -1,12 +1,16 @@
-import makeWASocket, {
-  useMultiFileAuthState,
-  DisconnectReason,
-  fetchLatestBaileysVersion
-} from '@whiskeysockets/baileys';
+import baileys from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import fs from 'fs';
 import path from 'path';
 import { obtenerConfig, verificarLlave, agregarCanal } from './lib/functions.js';
+import qrcode from 'qrcode-terminal'; // <== NUEVO: Librería para mostrar QR
+
+const {
+  default: makeWASocket,
+  useMultiFileAuthState,
+  DisconnectReason,
+  fetchLatestBaileysVersion
+} = baileys;
 
 const plugins = {};
 
@@ -31,8 +35,23 @@ async function iniciarBot() {
 
   const sock = makeWASocket({
     version,
-    printQRInTerminal: true,
     auth: state
+  });
+
+  // Mostrar QR visual con qrcode-terminal
+  sock.ev.on('connection.update', (update) => {
+    const { connection, qr } = update;
+
+    if (qr) {
+      console.log('\n📲 Escaneá el siguiente código QR para vincular el bot:\n');
+      qrcode.generate(qr, { small: true }); // <== Mostrar QR como imagen de consola
+    }
+
+    if (connection === 'open') {
+      console.log('✅ Conectado a WhatsApp');
+    } else if (connection === 'close') {
+      console.log('❌ Conexión cerrada');
+    }
   });
 
   sock.ev.on('messages.upsert', async ({ messages }) => {
@@ -44,7 +63,6 @@ async function iniciarBot() {
 
     if (plugins[command]) {
       try {
-        // Ejecutar el comando correspondiente
         await plugins[command](sock, m);
 
         // Enviar el enlace al canal de WhatsApp
