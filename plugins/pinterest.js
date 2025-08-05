@@ -1,51 +1,52 @@
-export const command = '.pinterest';
+import axios from 'axios';
+import { generateWAMessageFromContent, proto } from '@whiskeysockets/baileys';
 
-export const run = async (sock, m) => {
-  const text = m.message.conversation?.split(' ').slice(1).join(' ') || '';
-  if (!text) {
-    await sock.sendMessage(m.key.remoteJid, {
-      text: '❌ Tenés que escribir un término de búsqueda. Ejemplo: *.pinterest Goku*'
+const handler = async (sock, m, { args }) => {
+  const texto = args.join(' ');
+  if (!texto) {
+    return sock.sendMessage(m.key.remoteJid, {
+      text: '📸 Escribí algo para buscar en Pinterest.\n\nEjemplo:\n.pinterest Goku'
     }, { quoted: m });
-    return;
   }
 
-  // Enviar mensaje de espera
+  // Mensaje de espera
   await sock.sendMessage(m.key.remoteJid, {
-    text: `🔄 Buscando imágenes de *${text}*...`,
+    text: '🔄 Buscando imágenes en Pinterest...',
   }, { quoted: m });
 
   try {
-    // Buscar imágenes usando API no oficial
-    const res = await fetch(`https://pinterest-downloader-download.onrender.com/api/pin?q=${encodeURIComponent(text)}`);
-    const data = await res.json();
+    const res = await axios.get(`https://api.akuari.my.id/pinterest?query=${encodeURIComponent(texto)}`);
+    const resultados = res.data.result;
 
-    if (!data || !data.result || data.result.length === 0) {
-      throw new Error('No se encontraron imágenes.');
+    if (!resultados || resultados.length === 0) {
+      return sock.sendMessage(m.key.remoteJid, { text: '❌ No encontré imágenes para esa búsqueda.' }, { quoted: m });
     }
 
-    // Mostrar resultados como botones
-    const images = data.result.slice(0, 5); // máximo 5 resultados
-    const sections = [{
-      title: 'Resultados encontrados',
-      rows: images.map((img, i) => ({
-        title: `Imagen ${i + 1}`,
-        description: 'Tocá para ver esta imagen',
-        rowId: `.verpin ${img}`
-      }))
-    }];
+    // Elegimos las primeras 5 imágenes (puedes cambiar ese número)
+    const imagenes = resultados.slice(0, 5);
+    const botones = imagenes.map((img, index) => ({
+      buttonId: `.verimg ${img}`,
+      buttonText: { displayText: `🖼 Ver ${index + 1}` },
+      type: 1
+    }));
 
-    await sock.sendMessage(m.key.remoteJid, {
-      text: `🔎 Resultados para: *${text}*`,
-      footer: 'Seleccioná una imagen',
-      title: 'Pinterest',
-      buttonText: 'Ver imágenes',
-      sections
-    }, { quoted: m });
+    const mensaje = {
+      image: { url: imagenes[0] },
+      caption: `📌 Resultados para: *${texto}*\n\nToca un botón para ver otra imagen.`,
+      footer: 'HINATA - BOT',
+      buttons: botones,
+      headerType: 4
+    };
 
-  } catch (err) {
-    console.error('Error en .pinterest:', err);
+    await sock.sendMessage(m.key.remoteJid, mensaje, { quoted: m });
+
+  } catch (e) {
+    console.error('🛑 Error en .pinterest:', e);
     await sock.sendMessage(m.key.remoteJid, {
-      text: '❌ No se pudieron obtener imágenes. Intentá más tarde.'
+      text: '❌ Error al buscar imágenes. Intentalo de nuevo más tarde.',
     }, { quoted: m });
   }
 };
+
+handler.command = ['pinterest'];
+export default handler;
