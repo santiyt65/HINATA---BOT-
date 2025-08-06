@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { obtenerConfig, verificarLlave, agregarCanal } from './lib/functions.js';
 import { db } from './db.js';
+import { db } from './db.js';
 import qrcode from 'qrcode-terminal'; // <== NUEVO: Librería para mostrar QR
 
 const {
