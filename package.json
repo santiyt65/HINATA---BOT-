@@ -1,13 +1,20 @@
 {
   "name": "hinata-bot",
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "description": "Bot de WhatsApp HINATA",
   "main": "index.js",
   "type": "module",
-  "dependencies": {
-    "@hapi/boom": "^10.0.0",
-    "@whiskeysockets/baileys": "^6.7.0"
-  },
   "scripts": {
     "start": "node index.js"
+  },
+  "dependencies": {
+    "@hapi/boom": "^10.0.1",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@whiskeysockets/baileys": "^6.7.2",
+    "axios": "^1.6.8",
+    "fluent-ffmpeg": "^2.1.2",
+    "qrcode-terminal": "^0.12.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
   }
 }

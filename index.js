@@ -1,3 +1,4 @@
+import { execSync } from 'child_process';
 import baileys from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import fs from 'fs';
@@ -5,6 +6,19 @@ import path from 'path';
 import { obtenerConfig, verificarLlave, agregarCanal } from './lib/functions.js';
 import { db } from './db.js';
 import qrcode from 'qrcode-terminal'; // <== NUEVO: Librería para mostrar QR
+
+// --- Verificación e instalación automática de dependencias ---
+try {
+  const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+  if (!fs.existsSync('./node_modules')) {
+    console.log('🔧 No se encontraron las dependencias, instalando automáticamente...');
+    execSync('npm install', { stdio: 'inherit' });
+    console.log('✅ ¡Dependencias instaladas correctamente!');
+  }
+} catch (error) {
+  console.error('❌ Error al verificar o instalar dependencias:', error);
+  process.exit(1);
+}
 
 const {
   default: makeWASocket,
