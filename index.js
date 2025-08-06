@@ -10,17 +10,14 @@ import qrcode from 'qrcode-terminal'; // <== NUEVO: Librería para mostrar QR
 // --- Verificación e instalación automática de dependencias ---
 try {
   const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
-  if (!fs.existsSync('./node_modules')) {
-    console.log('🔧 No se encontraron las dependencias, instalando automáticamente...');
-    execSync('npm install', { stdio: 'inherit' });
     console.log('✅ ¡Dependencias instaladas correctamente!');
   }
-} catch (error) {
+}catch (error) {
   console.error('❌ Error al verificar o instalar dependencias:', error);
   process.exit(1);
-}
-
-const {
+} 
+import { db } from './db.js';
+import { db } from './db.js';
   default: makeWASocket,
   useMultiFileAuthState,
   DisconnectReason,
