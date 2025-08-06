@@ -3,6 +3,7 @@ import { Boom } from '@hapi/boom';
 import fs from 'fs';
 import path from 'path';
 import { obtenerConfig, verificarLlave, agregarCanal } from './lib/functions.js';
+import { db } from './db.js'; // Importar la base de datos
 import qrcode from 'qrcode-terminal'; // <== NUEVO: Librería para mostrar QR
 
 const {
@@ -58,12 +59,22 @@ async function iniciarBot() {
     const m = messages[0];
     if (!m.message) return;
 
+    const senderId = m.key.participant || m.sender;
+
+    // Verificar si el usuario está baneado
+    const user = await db.get('SELECT banned FROM usuarios WHERE chatId = ?', [senderId]);
+    if (user && user.banned === 1) {
+        console.log(`Usuario baneado ${senderId} intentó usar el bot.`);
+        return; // No procesar comandos de usuarios baneados
+    }
+
     const body = m.message.conversation || m.message.extendedTextMessage?.text || '';
-    const command = body.trim().toLowerCase();
+    const args = body.trim().split(/ +/);
+    const command = args.shift().toLowerCase();
 
     if (plugins[command]) {
       try {
-        await plugins[command](sock, m);
+        await plugins[command](sock, m, { text: args.join(' '), command });
 
         // Enviar el enlace al canal de WhatsApp
         await sock.sendMessage(m.key.remoteJid, {
