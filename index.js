@@ -20,6 +20,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { Boom } from '@hapi/boom';
+import { initDB } from './db.js';
 import { db } from './db.js'; // Asegúrate que db.js exporte la conexión a la DB
 
 const __filename = fileURLToPath(import.meta.url);
@@ -70,14 +71,14 @@ async function cargarPlugins() {
                     commands.forEach(cmd => {
                         const commandKey = cmd.startsWith('.') ? cmd : `.`;
                         if (plugins[commandKey]) {
-                            console.warn(`⚠️ ¡Comando duplicado! "" en "" será omitido.`);
+                            console.warn(`⚠️ ¡Comando duplicado! "${cmd}" en "${file}" será omitido.`);
                         } else {
                             plugins[commandKey] = plugin.run;
                         }
                     });
                 }
             } catch (err) {
-                console.error(`❌ Error al cargar el plugin "":`, err);
+                console.error(`❌ Error al cargar el plugin "${file}":`, err);
             }
         }
         console.log(`✅ ${Object.keys(plugins).length} comandos cargados.`);
@@ -91,6 +92,9 @@ async function cargarPlugins() {
 // ----------------------------------------
 
 async function connectToWhatsApp() {
+    // Inicializar base de datos
+    await initDB();
+
     // Cargar configuración y plugins al inicio
     config = await obtenerConfig();
     await cargarPlugins();
@@ -150,25 +154,14 @@ async function connectToWhatsApp() {
 
         const senderId = msg.key.remoteJid;
 
-        // Verificar si el usuario está baneado
-        try {
-            const user = await db.get('SELECT banned FROM usuarios WHERE chatId = ?', [senderId]);
-            if (user && user.banned === 1) {
-                console.log(`🚫 Usuario baneado  intentó usar el bot.`);
-                return; // No hacer nada si está baneado
-            }
-        } catch (dbError) {
-            console.error('❌ Error al consultar la base de datos para baneo:', dbError);
-        }
-
         const args = text.slice(prefix.length).trim().split(/ +/);
         const commandName = args.shift().toLowerCase();
-        const command = ``;
+        const command = prefix + commandName;
 
         const commandHandler = plugins[command];
 
         if (commandHandler) {
-            console.log(`💬 Comando:  | Argumentos: [${args.join(', ')}] | De: `);
+            console.log(`💬 Comando: ${command} | Argumentos: [${args.join(', ')}] | De: ${senderId}`);
             try {
                 await commandHandler(sock, msg, { text: args.join(' '), command, args });
             } catch (err) {

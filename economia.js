@@ -1,4 +1,4 @@
-import { db } from '../db.js';
+import { db } from './db.js';
 
 export const command = ['.saldo', '.apostar'];
 
@@ -7,9 +7,9 @@ export async function run(sock, m, { text, command }) {
 
     if (command === '.saldo') {
         try {
-            let usuario = await db.get('SELECT saldo FROM usuarios WHERE chatId = ?', chatId);
+            let usuario = await db.get('SELECT saldo FROM usuarios WHERE chatId = ?', [chatId]);
             if (!usuario) {
-                await db.run('INSERT INTO usuarios (chatId) VALUES (?)', chatId);
+                await db.run('INSERT INTO usuarios (chatId) VALUES (?)', [chatId]);
                 usuario = { saldo: 100 }; // Saldo inicial
             }
             await sock.sendMessage(chatId, { text: `💰 Tu saldo es de: ${usuario.saldo} puntos.` }, { quoted: m });
@@ -23,9 +23,9 @@ export async function run(sock, m, { text, command }) {
             return await sock.sendMessage(chatId, { text: '❌ Por favor, ingresa una cantidad válida para apostar.' }, { quoted: m });
         }
 
-        let usuario = await db.get('SELECT saldo FROM usuarios WHERE chatId = ?', chatId);
+        let usuario = await db.get('SELECT saldo FROM usuarios WHERE chatId = ?', [chatId]);
         if (!usuario) {
-            await sock.run('INSERT INTO usuarios (chatId) VALUES (?)', chatId);
+            await db.run('INSERT INTO usuarios (chatId) VALUES (?)', [chatId]);
             usuario = { saldo: 100 };
         }
 

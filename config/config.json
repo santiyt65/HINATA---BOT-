@@ -3,5 +3,9 @@
   "version": "1.0.0",
   "propietario": "Nicolas_Sanilo",
   "antiPrivado": true,
-  "tenorApiKey": "TU_API_KEY_DE_TENOR"
+  "tenorApiKey": "https://tenor.com/developer/dashboard",
+  "pexelsApiKey": " https://www.pexels.com/api/",
+  "huggingFaceApiKey": "https://huggingface.co/settings/tokens",
+  "openaiApiKey": "https://platform.openai.com/api-keys",
+  "replicateApiKey": "https://replicate.com/account/api-tokens"
 }
