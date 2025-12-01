@@ -16,6 +16,7 @@ import {
     makeCacheableSignalKeyStore
 } from '@whiskeysockets/baileys';
 import pino from 'pino';
+import qrcode from 'qrcode-terminal';
 import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
@@ -101,7 +102,7 @@ async function connectToWhatsApp() {
 
     const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
     const { version, isLatest } = await fetchLatestBaileysVersion();
-    console.log(`🤖 Usando WhatsApp v${version.join('.')}, ¿es la última versión?: `);
+    console.log(`🤖 Usando WhatsApp v${version.join('.')} (isLatest: ${isLatest})`);
 
     const sock = makeWASocket({
         version,
@@ -123,6 +124,16 @@ async function connectToWhatsApp() {
     // ---- MANEJO DE EVENTOS DE CONEXIÓN ----
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect } = update;
+
+        // Mostrar el QR explícitamente en terminal si viene en el update
+        if (update.qr) {
+            try {
+                qrcode.generate(update.qr, { small: true });
+                console.log('🔑 Escanea el QR mostrado en la terminal para iniciar sesión.');
+            } catch (err) {
+                console.log('🔑 QR recibido pero no se pudo mostrar en terminal:', err.message || err);
+            }
+        }
         if (connection === 'close') {
             const shouldReconnect = (lastDisconnect.error instanceof Boom) ?
                 lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut :
