@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "propietario": "Nicolas_Sanilo",
   "antiPrivado": true,
-  "tenorApiKey": "https://tenor.com/developer/dashboard",
-  "pexelsApiKey": " https://www.pexels.com/api/",
-  "huggingFaceApiKey": "https://huggingface.co/settings/tokens",
-  "openaiApiKey": "https://platform.openai.com/api-keys",
-  "replicateApiKey": "https://replicate.com/account/api-tokens"
+  "tenorApiKey": "AIzaSyC7Z9K4xM2nOpQrStUvWxYzAbCdEfGhIjKlMn",
+  "pexelsApiKey": "r2Dmg3gwzU6LEjrpC2hIvMQzQ30LAQS4yi75RDZTLyZS6anuzuQRJt9o",
+  "huggingFaceApiKey": "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",
+  "openaiApiKey": "sk-proj-NOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYz",
+  "replicateApiKey": "r8_NOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYz"
 }
