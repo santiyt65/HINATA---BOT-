@@ -57,7 +57,7 @@ async function cargarPlugins() {
     const pluginsDir = path.join(__dirname, 'plugins');
     try {
         const files = await fs.readdir(pluginsDir);
-        const pluginFiles = files.filter(file => file.endsWith('.js'));
+        const pluginFiles = files.filter(file => file.endsWith('.js') && file !== 'db.js' && file !== 'economia.js');
 
         console.log('🔌 Cargando plugins...');
         for (const file of pluginFiles) {

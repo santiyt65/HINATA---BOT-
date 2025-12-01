@@ -1,3 +1,4 @@
-// Shim de compatibilidad para economia.js en plugins
-// Re-exporta el módulo desde la raíz `../economia.js`
-export { command, run } from '../economia.js';
+// Este archivo está vacío
+// La implementación de economia.js está en la raíz: ../economia.js
+// Los comandos .saldo y .apostar se cargan desde allí
+// Este archivo existe solo como marcador para referencia
