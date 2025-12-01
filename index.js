@@ -21,8 +21,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { Boom } from '@hapi/boom';
-import { initDB } from './db.js';
-import { db } from './db.js'; // Asegúrate que db.js exporte la conexión a la DB
+import { initDB, db } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

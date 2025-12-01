@@ -3,7 +3,9 @@ import fs from 'fs';
 export const command = '.menu';
 
 export async function run(sock, m) {
-    let menu = `🌸 *HINATA - BOT* 🌸
+  const chatId = (m && m.key && m.key.remoteJid) ? m.key.remoteJid : (m.chat || m.from || '');
+
+  const menu = `🌸 *HINATA - BOT* 🌸
 
 📜 *Menú de Comandos:*
 🔹 .ping — Verifica si el bot está activo
@@ -11,10 +13,11 @@ export async function run(sock, m) {
 🔹 .juegos — Muestra el menú de juegos
 🔹 .anime <búsqueda> — Busca información de un anime
 🔹 .gif <búsqueda> — Busca y envía un GIF
+🔹 .pinterest <búsqueda> — Busca y envía imágenes de Pinterest
+🔹 .papel <búsqueda> — Busca un fondo de pantalla
 🔹 .top - Muestra el top de usuarios con más puntos
 🔹 .saldo - Muestra tu saldo actual
 🔹 .apostar <cantidad> - Apuesta una cantidad en los juegos
-🔹 .papel <búsqueda> — Busca un fondo de pantalla
 🔹 .sticker — Crea stickers de imágenes/videos
 🔹 .menu — Muestra este menú con imagen
 
@@ -25,10 +28,22 @@ export async function run(sock, m) {
 
 ✨ Más funciones próximamente...`;
 
-  const buffer = fs.readFileSync('./media/menu.jpg');
+  const imgPath = './media/menu.jpg';
 
-  await sock.sendMessage(m.key.remoteJid, {
-    image: buffer,
-    caption: menu
-  });
+  try {
+    if (fs.existsSync(imgPath)) {
+      const buffer = fs.readFileSync(imgPath);
+      await sock.sendMessage(chatId, { image: buffer, caption: menu }, { quoted: m });
+      return;
+    }
+  } catch (err) {
+    console.error('Error leyendo imagen de menu:', err && err.message ? err.message : err);
+  }
+
+  // Fallback a mensaje de texto si la imagen no está disponible
+  try {
+    await sock.sendMessage(chatId, { text: menu }, { quoted: m });
+  } catch (err) {
+    console.error('Error enviando menu como texto:', err && err.message ? err.message : err);
+  }
 }
