@@ -1,4 +1,4 @@
-import { run as economy } from './economia.js';
+import { run as economy } from '../economia.js';
 
 /**
  * @file Plugin para un juego de máquina tragamonedas (slots).

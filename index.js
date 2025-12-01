@@ -70,7 +70,7 @@ async function cargarPlugins() {
                 if (plugin.command) {
                     const commands = Array.isArray(plugin.command) ? plugin.command : [plugin.command];
                     commands.forEach(cmd => {
-                        const commandKey = cmd.startsWith('.') ? cmd : `.`;
+                        const commandKey = cmd.startsWith('.') ? cmd : `.${cmd}`;
                         if (plugins[commandKey]) {
                             console.warn(`⚠️ ¡Comando duplicado! "${cmd}" en "${file}" será omitido.`);
                         } else {

@@ -1,13 +1,6 @@
-/**
- * @file Plugin Creater - Genera bocetos usando IA
- * @description Crea bocetos y dibujos usando APIs de generación de imágenes con IA
- * @version 1.0.0
- */
+// Archivo renombrado a minúsculas: creater.js
+// Para mantener consistencia con la convención de nombres
 
-import axios from 'axios';
-import { obtenerConfig } from '../lib/functions.js';
-
-export const command = '.creater';
 
 /**
  * Genera un boceto usando Hugging Face API (modelo de difusión)
