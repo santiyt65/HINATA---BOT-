@@ -31,6 +31,12 @@ const plugins = {};
 // Almacén global para la configuración
 let config = {};
 
+// Cooldown maps for rate-limiting
+// key: `${command}:${userId}` -> timestamp (ms)
+const cooldownsMap = new Map();
+// key: chatId -> array of timestamps (ms) of recent commands
+const groupUsageMap = new Map();
+
 // ----------------------------------------
 //          FUNCIONES AUXILIARES
 // ----------------------------------------
@@ -171,11 +177,79 @@ async function connectToWhatsApp() {
         const commandHandler = plugins[command];
 
         if (commandHandler) {
-            console.log(`💬 Comando: ${command} | Argumentos: [${args.join(', ')}] | De: ${senderId}`);
+            // Cooldown and rate-limiting logic
             try {
+                const now = Date.now();
+                const userId = msg.key.participant || msg.key.remoteJid;
+                const chatId = msg.key.remoteJid;
+
+                // Reload runtime config so changes via .setcooldown apply immediately
+                let runtimeConfig = {};
+                try {
+                    runtimeConfig = await obtenerConfig();
+                } catch (e) {
+                    runtimeConfig = config || {};
+                }
+
+                // Load cooldown config (defaults)
+                const perUserSec = (runtimeConfig.cooldowns && runtimeConfig.cooldowns.perUser) ? runtimeConfig.cooldowns.perUser : 5;
+                const groupBurstLimit = (runtimeConfig.cooldowns && runtimeConfig.cooldowns.groupBurstLimit) ? runtimeConfig.cooldowns.groupBurstLimit : 25;
+                const groupBurstSeconds = (runtimeConfig.cooldowns && runtimeConfig.cooldowns.groupBurstSeconds) ? runtimeConfig.cooldowns.groupBurstSeconds : 60;
+
+                // Owner bypass: if sender is owner, skip cooldowns
+                const ownerId = (runtimeConfig.ownerJid && runtimeConfig.ownerJid.toString().trim()) || (runtimeConfig.propietario && runtimeConfig.propietario.toString().trim()) || '';
+                let isOwner = false;
+                if (ownerId) {
+                    try {
+                        if (ownerId.includes('@')) {
+                            isOwner = userId === ownerId;
+                        } else {
+                            // allow matching by phone or partial match
+                            isOwner = userId === ownerId || userId.includes(ownerId) || userId.startsWith(ownerId);
+                        }
+                    } catch (e) {
+                        isOwner = false;
+                    }
+                }
+
+                if (isOwner) {
+                    // propietario exento de cooldowns
+                    console.log(`🔓 Usuario propietario detectado (${userId}), saltando cooldowns para ${command}`);
+                    await commandHandler(sock, msg, { text: args.join(' '), command, args });
+                    return;
+                }
+
+                // Per-user per-command cooldown
+                const cmdKey = `${command}:${userId}`;
+                const lastUsed = cooldownsMap.get(cmdKey) || 0;
+                const waitMs = perUserSec * 1000 - (now - lastUsed);
+                if (lastUsed && waitMs > 0) {
+                    const waitSec = Math.ceil(waitMs / 1000);
+                    await sock.sendMessage(chatId, { text: `⌛ Por favor espera ${waitSec}s antes de usar el comando ${command} nuevamente.` }, { quoted: msg });
+                    return;
+                }
+
+                // Group burst limiting to reduce spam
+                const windowStart = now - (groupBurstSeconds * 1000);
+                let timestamps = groupUsageMap.get(chatId) || [];
+                // Keep only recent timestamps
+                timestamps = timestamps.filter(t => t >= windowStart);
+                if (timestamps.length >= groupBurstLimit) {
+                    await sock.sendMessage(chatId, { text: `⚠️ Demasiados comandos en este grupo. Por favor espera unos segundos antes de usar más comandos.` }, { quoted: msg });
+                    // update map with filtered list (no push since blocked)
+                    groupUsageMap.set(chatId, timestamps);
+                    return;
+                }
+
+                // Record usage
+                timestamps.push(now);
+                groupUsageMap.set(chatId, timestamps);
+                cooldownsMap.set(cmdKey, now);
+
+                console.log(`💬 Comando: ${command} | Argumentos: [${args.join(', ')}] | De: ${senderId}`);
                 await commandHandler(sock, msg, { text: args.join(' '), command, args });
             } catch (err) {
-                console.error(`❌ Error ejecutando el comando "":`, err);
+                console.error(`❌ Error ejecutando el comando "${command}":`, err);
                 await sock.sendMessage(msg.key.remoteJid, { text: '❌ Ocurrió un error inesperado al ejecutar ese comando.' }, { quoted: msg });
             }
         }

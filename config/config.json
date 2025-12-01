@@ -8,4 +8,12 @@
   "huggingFaceApiKey": "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",
   "openaiApiKey": "sk-proj-NOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYz",
   "replicateApiKey": "r8_NOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYz"
+  ,
+  "cooldowns": {
+    "perUser": 10,
+    "groupBurstLimit": 20,
+    "groupBurstSeconds": 60
+  }
+  ,
+  "ownerJid": ""
 }
