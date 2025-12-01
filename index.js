@@ -41,10 +41,10 @@ let config = {};
  */
 async function obtenerConfig() {
     try {
-        const data = await fs.readFile('config.json', 'utf8');
+        const data = await fs.readFile('config/config.json', 'utf8');
         return JSON.parse(data);
     } catch (error) {
-        console.error('❌ Error al leer o parsear config.json. Asegúrate de que el archivo existe y es un JSON válido.', error);
+        console.error('❌ Error al leer o parsear config/config.json. Asegúrate de que el archivo existe y es un JSON válido.', error);
         // Termina el proceso si no hay configuración, ya que es vital.
         process.exit(1);
     }
