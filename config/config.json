@@ -7,13 +7,15 @@
   "pexelsApiKey": "r2Dmg3gwzU6LEjrpC2hIvMQzQ30LAQS4yi75RDZTLyZS6anuzuQRJt9o",
   "huggingFaceApiKey": "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",
   "openaiApiKey": "sk-proj-NOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYz",
-  "replicateApiKey": "r8_NOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYz"
-  ,
+  "replicateApiKey": "r8_NOpQrStUvWxYzAbCdEfGhIjKlMnOpQrStUvWxYz",
+  "googleSearchApiKey": "AIzaSyB4ZexN_86YJcVqMBKvyhPKNZYD2NXPZv4",
+  "googleCseId": "44404c6f7af7c418a",
+  
   "cooldowns": {
     "perUser": 10,
     "groupBurstLimit": 20,
     "groupBurstSeconds": 60
   }
   ,
-  "ownerJid": "542604035392@s.whatsapp.net"
+  "ownerJid": "+542604035392@s.whatsapp.net"
 }

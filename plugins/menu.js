@@ -16,6 +16,7 @@ export async function run(sock, m) {
 🔹 .creater — Muestra el creador del bot.
 
 *BÚSQUEDA*
+🔹 .google <búsqueda> — Busca en Google.
 🔹 .anime <nombre> — Busca información de un anime.
 🔹 .gif <búsqueda> — Busca y envía un GIF.
 🔹 .pinterest <búsqueda> — Busca imágenes en Pinterest.
