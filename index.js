@@ -27,7 +27,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Almacén global para los comandos cargados
-const plugins = {};
+export const plugins = {};
 // Almacén global para la configuración
 let config = {};
 
@@ -59,11 +59,14 @@ async function obtenerConfig() {
 /**
  * Carga dinámicamente todos los comandos desde la carpeta 'plugins'.
  */
-async function cargarPlugins() {
+export async function cargarPlugins() {
+    // Limpiar plugins antiguos para permitir la recarga en caliente
+    Object.keys(plugins).forEach(key => delete plugins[key]);
+
     const pluginsDir = path.join(__dirname, 'plugins');
     try {
         const files = await fs.readdir(pluginsDir);
-        const pluginFiles = files.filter(file => file.endsWith('.js') && file !== 'db.js' && file !== 'economia.js');
+        const pluginFiles = files.filter(file => file.endsWith('.js') && file !== 'db.js');
 
         console.log('🔌 Cargando plugins...');
         for (const file of pluginFiles) {
