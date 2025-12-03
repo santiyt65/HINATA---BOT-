@@ -8,25 +8,43 @@ export async function run(sock, m) {
   const menu = `🌸 *HINATA - BOT* 🌸
 
 📜 *Menú de Comandos:*
-🔹 .ping — Verifica si el bot está activo
-🔹 .info — Muestra información del bot
-🔹 .juegos — Muestra el menú de juegos
-🔹 .anime <búsqueda> — Busca información de un anime
-🔹 .gif <búsqueda> — Busca y envía un GIF
-🔹 .pinterest <búsqueda> — Busca y envía imágenes de Pinterest
-🔹 .papel <búsqueda> — Busca un fondo de pantalla
-🔹 .top - Muestra el top de usuarios con más puntos
-🔹 .saldo - Muestra tu saldo actual
-🔹 .apostar <cantidad> - Apuesta una cantidad en los juegos
-🔹 .sticker — Crea stickers de imágenes/videos
-🔹 .menu — Muestra este menú con imagen
 
-👑 *Comandos de Administrador:*
-🔹 .ban @usuario — Impide que un usuario use el bot
-🔹 .unban @usuario — Permite que un usuario vuelva a usar el bot
-🔹 .kick @usuario — Expulsa a un usuario de un grupo
+*GENERAL*
+🔹 .ping — Verifica si el bot está activo.
+🔹 .info — Muestra información del bot.
+🔹 .menu — Muestra este menú.
+🔹 .creater — Muestra el creador del bot.
 
-✨ Más funciones próximamente...`;
+*BÚSQUEDA*
+🔹 .anime <nombre> — Busca información de un anime.
+🔹 .gif <búsqueda> — Busca y envía un GIF.
+🔹 .pinterest <búsqueda> — Busca imágenes en Pinterest.
+🔹 .papel <búsqueda> — Busca un fondo de pantalla.
+
+*HERRAMIENTAS*
+🔹 .sticker — Crea stickers de imágenes/videos.
+🔹 .musica <búsqueda> — Descarga música de YouTube.
+
+*JUEGOS*
+🔹 .juegos — Muestra el menú de juegos.
+🔹 .adivina <número> — Adivina el número secreto.
+🔹 .ahorcado <letra> — Juega al ahorcado.
+🔹 .ppt <piedra|papel|tijera> — Juega piedra, papel o tijera.
+🔹 .slot — Juega a la máquina tragamonedas.
+🔹 .trivia — Responde preguntas de trivia.
+
+*ECONOMÍA*
+🔹 .saldo — Muestra tu saldo actual.
+🔹 .apostar <cantidad> — Apuesta en los juegos.
+
+👑 *ADMINISTRADOR*
+🔹 .ban @usuario — Impide que un usuario use el bot.
+🔹 .unban @usuario — Permite que un usuario vuelva a usar el bot.
+🔹 .kick @usuario — Expulsa a un usuario de un grupo.
+
+🔒 *PROPIETARIO*
+🔹 .reload — Recarga los plugins del bot.
+🔹 .setcooldown <tiempo> — Configura el tiempo de espera de los comandos.`;
 
   const imgPath = './media/menu.jpg';
 
