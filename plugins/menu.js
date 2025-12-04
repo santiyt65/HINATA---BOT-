@@ -29,8 +29,9 @@ export async function run(sock, m) {
 ├─⬣「 *MULTIMEDIA* 🎵🖼️ 」
 │  │
 │  ├─ *.musica* <canción/URL> [formato]
-│  │  └ _Descarga música en MP3, WAV, OGG, etc._
-│  │  └ _Soporta YouTube, SoundCloud, TikTok, etc._
+│  │  └ _Descarga música en múltiples formatos._
+│  │  └ _Formatos: MP3, WAV, OGG, OPUS, M4A_
+│  │  └ _Plataformas: YouTube, SoundCloud, TikTok_
 │  │
 │  ├─ *.sticker*
 │  │  └ _Crea un sticker de imagen/video._
@@ -41,28 +42,36 @@ export async function run(sock, m) {
 │
 ├─⬣「 *ACCIONES ANIME* 🎭 」
 │  │
-│  ├─ *.pegar* / *.golpear* @usuario
-│  │  └ _GIF de golpe anime._
+│  ├─ *Agresivas:* 👊
+│  │  • *.pegar* / *.slap* @usuario
+│  │  • *.patada* / *.kick* @usuario
+│  │  • *.morder* / *.bite* @usuario
 │  │
-│  ├─ *.abrazar* / *.hug* @usuario
-│  │  └ _GIF de abrazo anime._
+│  ├─ *Cariñosas:* 💕
+│  │  • *.abrazar* / *.hug* @usuario
+│  │  • *.besar* / *.kiss* @usuario
+│  │  • *.acariciar* / *.pat* @usuario
+│  │  • *.alimentar* / *.feed* @usuario
 │  │
-│  ├─ *.besar* / *.kiss* @usuario
-│  │  └ _GIF de beso anime._
+│  ├─ *Interactivas:* 🎪
+│  │  • *.picar* / *.poke* @usuario
+│  │  • *.cosquillas* / *.tickle* @usuario
+│  │  • *.saludar* / *.wave* @usuario
+│  │  • *.bailar* / *.dance* @usuario
 │  │
-│  ├─ *.acariciar* / *.pat* @usuario
-│  │  └ _GIF de caricias anime._
-│  │
-│  └─ *.morder* | *.abofetar* | *.pellizcar* @usuario
-│     └ _Más acciones anime con GIFs._
+│  └─ *Emocionales:* 😊
+│     • *.llorar* / *.cry*
+│     • *.reir* / *.laugh*
+│     • *.sonrojar* / *.blush*
+│     • *.dormir* / *.sleep*
 │
 ├─⬣「 *JUEGOS* 🎮 」
 │  │
 │  ├─ *.juegos*
-│  │  └ _Muestra el menú completo de juegos._
+│  │  └ _Menú completo de juegos._
 │  │
 │  ├─ *.adivina*
-│  │  └ _Juego de adivinar el número._
+│  │  └ _Adivina el número._
 │  │
 │  ├─ *.ahorcado*
 │  │  └ _Juego del ahorcado._
@@ -76,17 +85,14 @@ export async function run(sock, m) {
 │  ├─ *.ppt* <piedra|papel|tijera>
 │  │  └ _Piedra, papel o tijera._
 │  │
-│  ├─ *.piedra* | *.papel* | *.tijera*
-│  │  └ _Atajos para PPT._
-│  │
 │  ├─ *.payasos* [cantidad]
-│  │  └ _Lista aleatoria de payasos del grupo 🤡_
+│  │  └ _Lista de payasos del grupo 🤡_
 │  │
 │  ├─ *.femboys* [cantidad]
-│  │  └ _Lista aleatoria de femboys del grupo 💅_
+│  │  └ _Lista de femboys del grupo 💅_
 │  │
 │  └─ *.tomboys* [cantidad]
-│     └ _Lista aleatoria de tomboys del grupo 🏀_
+│     └ _Lista de tomboys del grupo 🏀_
 │
 ├─⬣「 *ECONOMÍA* 💰 」
 │  │
@@ -98,41 +104,54 @@ export async function run(sock, m) {
 │  │
 │  ├─ *.mision* | *.misiondiaria*
 │  │  └ _Obtén tu misión diaria._
+│  │  └ _Gana entre 50-300 puntos._
 │  │
 │  ├─ *.completarmision*
-│  │  └ _Completa tu misión y gana saldo._
+│  │  └ _Completa tu misión y cobra._
 │  │
-│  └─ *.ranking* | *.top* | *.leaderboard* [número]
+│  └─ *.ranking* | *.top* [número]
 │     └ _Ranking de saldos del grupo._
+│     └ _Ver quién tiene más puntos._
 │
 ├─⬣「 *GRUPOS* 🛡️ 」
 │  │
-│  ├─ *.kick* <@usuario>
-│  │  └ _Elimina a un miembro del grupo._
+│  ├─ *.kick* @usuario
+│  │  └ _Expulsa a un miembro._
 │  │  └ _(Solo admins)_
 │  │
-│  └─ *.inactivos* [días]
-│     └ _Muestra miembros inactivos._
-│     └ _Por defecto: 7 días._
+│  ├─ *.inactivos* [días]
+│  │  └ _Lista de miembros inactivos._
+│  │  └ _Predeterminado: 7 días._
+│  │
+│  ├─ *.ban* @usuario
+│  │  └ _Banea del bot._
+│  │  └ _(Solo propietario)_
+│  │
+│  └─ *.unban* @usuario
+│     └ _Desbanea del bot._
+│     └ _(Solo propietario)_
 │
 ├─⬣「 *INFORMACIÓN* ℹ️ 」
+│  │
+│  ├─ *.menu*
+│  │  └ _Muestra este menú._
 │  │
 │  ├─ *.info*
 │  │  └ _Información del bot._
 │  │
 │  ├─ *.ping*
-│  │  └ _Verifica la latencia del bot._
+│  │  └ _Verifica la latencia._
 │  │
 │  ├─ *.help* [comando]
-│  │  └ _Ayuda detallada de comandos._
+│  │  └ _Ayuda detallada._
 │  │
 │  └─ *.creater*
-│     └ _Información del creador._
+│     └ _Info del creador._
 │
 ├─⬣「 *BOT ADMIN* ⚙️ 」
 │  │
-│  ├─ *.reload* | *.updateplugins*
-│  │  └ _Recarga los plugins del bot._
+│  ├─ *.reload*
+│  │  └ _Recarga los plugins._
 │  │  └ _(Solo propietario)_
 │  │
 │  ├─ *.cmd* <on|off> <comando>
@@ -140,11 +159,12 @@ export async function run(sock, m) {
 │  │  └ _(Solo propietario)_
 │  │
 │  └─ *.setcooldown* <clave> <valor>
-│     └ _Configura tiempos de espera._
+│     └ _Configura cooldowns._
 │     └ _(Solo propietario)_
 │
-│  💡 _Usa .help <comando> para más detalles._
-│  📊 _Total de comandos disponibles: 30+_
+│  💡 _Usa .help <comando> para más info._
+│  🎮 _Total: 50+ comandos disponibles_
+│  🌟 _Actualizado con nuevas funciones_
 │
 ╰─⬣「 Creado por *santiyt65* 」⬣─╯
 `;
