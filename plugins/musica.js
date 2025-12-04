@@ -14,6 +14,17 @@ ffmpeg.setFfmpegPath(ffmpegPath.path);
 
 export const command = '.musica';
 
+export const help = `
+Descarga y envía una canción desde YouTube en formato MP3.
+
+*Uso:*
+  \`.musica <nombre de la canción o URL de YouTube>\`
+
+*Ejemplos:*
+  - \`.musica Queen - Bohemian Rhapsody\`
+  - \`.musica https://www.youtube.com/watch?v=fJ9rUzIMcZQ\`
+`;
+
 export async function run(sock, m, { text }) {
   const chatId = m.key.remoteJid;
   const config = obtenerConfig();

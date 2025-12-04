@@ -9,7 +9,6 @@
 //          IMPORTS Y CONFIGURACIÓN
 // ----------------------------------------
 import {
-    default as makeWASocket,
     DisconnectReason,
     useMultiFileAuthState,
     fetchLatestBaileysVersion,
@@ -23,11 +22,14 @@ import { fileURLToPath } from 'url';
 import { Boom } from '@hapi/boom';
 import { initDB, db } from './db.js';
 
+// Importa makeWASocket como default
+import makeWASocket from '@whiskeysockets/baileys';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Almacén global para los comandos cargados
-export const plugins = {};
+export let plugins = new Map();
 // Almacén global para la configuración
 let config = {};
 
@@ -60,12 +62,13 @@ async function obtenerConfig() {
  * Carga dinámicamente todos los comandos desde la carpeta 'plugins'.
  */
 export async function cargarPlugins() {
-    // Limpiar plugins antiguos para permitir la recarga en caliente
-    Object.keys(plugins).forEach(key => delete plugins[key]);
+    const newPlugins = new Map();
+    const errors = [];
 
     const pluginsDir = path.join(__dirname, 'plugins');
     try {
         const files = await fs.readdir(pluginsDir);
+        // Filtra los archivos .js y excluye db.js
         const pluginFiles = files.filter(file => file.endsWith('.js') && file !== 'db.js');
 
         console.log('🔌 Cargando plugins...');
@@ -78,21 +81,27 @@ export async function cargarPlugins() {
                 if (plugin.command) {
                     const commands = Array.isArray(plugin.command) ? plugin.command : [plugin.command];
                     commands.forEach(cmd => {
+                        // Asegura que el comando empiece con '.'
                         const commandKey = cmd.startsWith('.') ? cmd : `.${cmd}`;
-                        if (plugins[commandKey]) {
+                        if (newPlugins.has(commandKey)) {
                             console.warn(`⚠️ ¡Comando duplicado! "${cmd}" en "${file}" será omitido.`);
                         } else {
-                            plugins[commandKey] = plugin.run;
+                            // Guarda el módulo completo, no solo la función run
+                            newPlugins.set(commandKey, plugin);
                         }
                     });
                 }
             } catch (err) {
                 console.error(`❌ Error al cargar el plugin "${file}":`, err);
+                errors.push({ file, error: err.message });
             }
         }
-        console.log(`✅ ${Object.keys(plugins).length} comandos cargados.`);
+        plugins = newPlugins; // Reemplaza los plugins antiguos con los nuevos
+        console.log(`✅ ${plugins.size} comandos cargados.`);
+        return { plugins, errors }; // Devuelve tanto los plugins como los errores
     } catch (error) {
         console.error('❌ No se pudo leer el directorio de plugins. Asegúrate de que la carpeta "plugins" existe.', error);
+        return { plugins: new Map(), errors: [{ file: 'directorio de plugins', error: error.message }] };
     }
 }
 
@@ -106,7 +115,7 @@ async function connectToWhatsApp() {
 
     // Cargar configuración y plugins al inicio
     config = await obtenerConfig();
-    await cargarPlugins();
+    ({ plugins } = await cargarPlugins());
 
     const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
     const { version, isLatest } = await fetchLatestBaileysVersion();
@@ -166,6 +175,22 @@ async function connectToWhatsApp() {
         // Ignorar mensajes propios y de estado
         if (msg.key.fromMe || msg.key.remoteJid === 'status@broadcast') return;
 
+        const chatId = msg.key.remoteJid;
+        const userId = msg.key.participant || msg.key.remoteJid;
+
+        // Registrar actividad de usuario en grupos
+        if (chatId.endsWith('@g.us')) {
+            try {
+                // Usamos INSERT ... ON CONFLICT para crear o actualizar el registro
+                await db.run(
+                    'INSERT INTO group_activity (chatId, userId, lastSeen) VALUES (?, ?, CURRENT_TIMESTAMP) ON CONFLICT(chatId, userId) DO UPDATE SET lastSeen = CURRENT_TIMESTAMP',
+                    [chatId, userId]
+                );
+            } catch (dbErr) {
+                console.error('❌ Error al actualizar la actividad del usuario:', dbErr);
+            }
+        }
+
         const text = msg.message?.conversation || msg.message?.extendedTextMessage?.text || '';
         const prefix = '.'; // Prefijo para los comandos
 
@@ -173,18 +198,17 @@ async function connectToWhatsApp() {
 
         const senderId = msg.key.remoteJid;
 
-        const args = text.slice(prefix.length).trim().split(/ +/);
+        const args = text.slice(prefix.length).trim().split(/ +/); // senderId ya está definido arriba
         const commandName = args.shift().toLowerCase();
         const command = prefix + commandName;
+        
+        const plugin = plugins.get(command);
 
-        const commandHandler = plugins[command];
-
-        if (commandHandler) {
+        if (plugin) {
             // Cooldown and rate-limiting logic
             try {
                 const now = Date.now();
-                const userId = msg.key.participant || msg.key.remoteJid;
-                const chatId = msg.key.remoteJid;
+                // userId y chatId ya están definidos arriba
 
                 // Reload runtime config so changes via .setcooldown apply immediately
                 let runtimeConfig = {};
@@ -218,7 +242,7 @@ async function connectToWhatsApp() {
                 if (isOwner) {
                     // propietario exento de cooldowns
                     console.log(`🔓 Usuario propietario detectado (${userId}), saltando cooldowns para ${command}`);
-                    await commandHandler(sock, msg, { text: args.join(' '), command, args });
+                    await plugin.run(sock, msg, { text: args.join(' '), command, args, plugins });
                     return;
                 }
 
@@ -250,7 +274,7 @@ async function connectToWhatsApp() {
                 cooldownsMap.set(cmdKey, now);
 
                 console.log(`💬 Comando: ${command} | Argumentos: [${args.join(', ')}] | De: ${senderId}`);
-                await commandHandler(sock, msg, { text: args.join(' '), command, args });
+                await plugin.run(sock, msg, { text: args.join(' '), command, args, plugins });
             } catch (err) {
                 console.error(`❌ Error ejecutando el comando "${command}":`, err);
                 await sock.sendMessage(msg.key.remoteJid, { text: '❌ Ocurrió un error inesperado al ejecutar ese comando.' }, { quoted: msg });

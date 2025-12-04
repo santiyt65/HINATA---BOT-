@@ -5,47 +5,50 @@ export const command = '.menu';
 export async function run(sock, m) {
   const chatId = (m && m.key && m.key.remoteJid) ? m.key.remoteJid : (m.chat || m.from || '');
 
-  const menu = `🌸 *HINATA - BOT* 🌸
-
-📜 *Menú de Comandos:*
-
-*GENERAL*
-🔹 .ping — Verifica si el bot está activo.
-🔹 .info — Muestra información del bot.
-🔹 .menu — Muestra este menú.
-🔹 .creater — Muestra el creador del bot.
-
-*BÚSQUEDA*
-🔹 .google <búsqueda> — Busca en Google.
-🔹 .anime <nombre> — Busca información de un anime.
-🔹 .gif <búsqueda> — Busca y envía un GIF.
-🔹 .pinterest <búsqueda> — Busca imágenes en Pinterest.
-🔹 .papel <búsqueda> — Busca un fondo de pantalla.
-
-*HERRAMIENTAS*
-🔹 .sticker — Crea stickers de imágenes/videos.
-🔹 .musica <búsqueda> — Descarga música de YouTube.
-
-*JUEGOS*
-🔹 .juegos — Muestra el menú de juegos.
-🔹 .adivina <número> — Adivina el número secreto.
-🔹 .ahorcado <letra> — Juega al ahorcado.
-🔹 .ppt <piedra|papel|tijera> — Juega piedra, papel o tijera.
-🔹 .slot — Juega a la máquina tragamonedas.
-🔹 .trivia — Responde preguntas de trivia.
-
-*ECONOMÍA*
-🔹 .saldo — Muestra tu saldo actual.
-🔹 .apostar <cantidad> — Apuesta en los juegos.
-
-👑 *ADMINISTRADOR*
-🔹 .ban @usuario — Impide que un usuario use el bot.
-🔹 .unban @usuario — Permite que un usuario vuelva a usar el bot.
-🔹 .kick @usuario — Expulsa a un usuario de un grupo.
-
-🔒 *PROPIETARIO*
-🔹 .reload — Recarga los plugins del bot.
-🔹 .setcooldown <tiempo> — Configura el tiempo de espera de los comandos.`;
+  const menu =  `
+╭─⬣「 *HINATA-BOT* 」⬣─╮
+│
+│  ¡Hola, {userName}! 👋
+│  Soy Hinata, tu asistente virtual.
+│  Aquí tienes mi lista de comandos:
+│
+├─⬣「 *MÚSICA Y VIDEO* 🎵 」
+│  │
+│  ├─ *.play* <canción>
+│  │  └ _Reproduce una canción de YouTube._
+│  │
+│  └─ *.yt* <video>
+│     └ _Busca y descarga un video._
+│
+├─⬣「 *BÚSQUEDAS* 🔍 」
+│  │
+│  ├─ *.google* <texto>
+│  │  └ _Busca información en Google._
+│  │
+│  └─ *.letra* <canción>
+│     └ _Encuentra la letra de una canción._
+│
+├─⬣「 *DIVERSIÓN* ✨ 」
+│  │
+│  ├─ *.sticker*
+│  │  └ _Convierte una imagen en sticker._
+│  │
+│  └─ *.meme*
+│     └ _Genera un meme al azar._
+│
+├─⬣「 *GRUPOS* 🛡️ 」
+│  │
+│  ├─ *.add* <número>
+│  │  └ _Añade un miembro al grupo._
+│  │
+│  └─ *.kick* <@usuario>
+│     └ _Elimina a un miembro del grupo._
+│
+│
+│  💡 _Usa .help <comando> para más detalles._
+│
+╰─⬣「 Creado por *Tu Nombre* 」⬣─╯
+`;
 
   const imgPath = './media/menu.jpg';
 

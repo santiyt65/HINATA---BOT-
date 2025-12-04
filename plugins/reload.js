@@ -35,10 +35,20 @@ export async function run(sock, msg) {
         // 3. Si es el propietario, ejecutar la recarga
         await sock.sendMessage(chatId, { text: '🔄 Recargando plugins... Por favor espera.' }, { quoted: msg });
 
-        await cargarPlugins();
+        const { plugins: loadedPlugins, errors } = await cargarPlugins();
 
-        await sock.sendMessage(chatId, { text: '✅ Plugins recargados correctamente.' }, { quoted: msg });
-        console.log(`🔄 Plugins recargados por el propietario (${senderId})`);
+        let responseText = `✅ Recarga completada. Se cargaron ${loadedPlugins.size} comandos.`;
+
+        if (errors.length > 0) {
+            responseText += '\n\n*Se encontraron errores en los siguientes plugins:*\n';
+            errors.forEach(err => {
+                responseText += `\n📄 *Archivo:* ${err.file}\n   └─ 🐛 *Error:* ${err.error}`;
+            });
+            responseText += '\n\nEstos plugins no estarán disponibles hasta que se corrijan los errores.';
+        }
+
+        await sock.sendMessage(chatId, { text: responseText }, { quoted: msg });
+        console.log(`🔄 Plugins recargados por el propietario (${senderId}). Errores: ${errors.length}`);
 
     } catch (error) {
         console.error('❌ Error en el comando .reload:', error);

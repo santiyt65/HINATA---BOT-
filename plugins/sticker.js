@@ -15,6 +15,17 @@ ffmpeg.setFfmpegPath(ffmpegPath.path);
 
 export const command = '.sticker';
 
+export const help = `
+Crea un sticker a partir de una imagen o video.
+
+*Uso:*
+  - Responde a una imagen o video con el comando \`.sticker\`.
+  - Envía una imagen o video junto con el comando \`.sticker\` en el mismo mensaje.
+
+*Notas:*
+  - Los videos se recortarán a un máximo de 10 segundos.
+`;
+
 async function bufferToWebp(inputBuffer, isVideo = false) {
     const tmpDir = os.tmpdir();
     const inName = path.join(tmpDir, `hinata_in_${Date.now()}_${Math.random().toString(36).slice(2)}`);

@@ -48,6 +48,19 @@ export async function initDB() {
                 intentos INTEGER DEFAULT 0,
                 createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
             );
+
+            CREATE TABLE IF NOT EXISTS command_blacklist (
+                chatId TEXT NOT NULL,
+                command TEXT NOT NULL,
+                PRIMARY KEY (chatId, command)
+            );
+
+            CREATE TABLE IF NOT EXISTS group_activity (
+                chatId TEXT NOT NULL,
+                userId TEXT NOT NULL,
+                lastSeen DATETIME DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (chatId, userId)
+            );
         `);
 
         console.log('✅ Base de datos inicializada correctamente.');
