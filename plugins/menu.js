@@ -39,6 +39,23 @@ export async function run(sock, m) {
 │  └─ *.gif* <texto>
 │     └ _Busca y envía un GIF animado._
 │
+├─⬣「 *ACCIONES ANIME* 🎭 」
+│  │
+│  ├─ *.pegar* / *.golpear* @usuario
+│  │  └ _GIF de golpe anime._
+│  │
+│  ├─ *.abrazar* / *.hug* @usuario
+│  │  └ _GIF de abrazo anime._
+│  │
+│  ├─ *.besar* / *.kiss* @usuario
+│  │  └ _GIF de beso anime._
+│  │
+│  ├─ *.acariciar* / *.pat* @usuario
+│  │  └ _GIF de caricias anime._
+│  │
+│  └─ *.morder* | *.abofetar* | *.pellizcar* @usuario
+│     └ _Más acciones anime con GIFs._
+│
 ├─⬣「 *JUEGOS* 🎮 」
 │  │
 │  ├─ *.juegos*
