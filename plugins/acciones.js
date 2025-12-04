@@ -1,37 +1,66 @@
 /**
  * @file Plugin Acciones - Envía GIFs de anime con acciones interactivas
- * @version 1.0.0
+ * @version 2.0.0
+ * @description Usa la API de Nekos.best para GIFs de anime de alta calidad
  */
 
 import axios from 'axios';
-import { obtenerConfig } from '../lib/functions.js';
 
 export const command = [
-  '.pegar', '.golpear', '.slap',
+  '.pegar', '.slap',
   '.abrazar', '.hug',
   '.besar', '.kiss',
   '.acariciar', '.pat',
   '.morder', '.bite',
-  '.abofetar',
-  '.abrazo',
-  '.palmadita',
-  '.cachetada',
-  '.pellizcar',
-  '.empujar'
+  '.alimentar', '.feed',
+  '.sonrojar', '.blush',
+  '.sonreir', '.smile',
+  '.saludar', '.wave',
+  '.bailar', '.dance',
+  '.llorar', '.cry',
+  '.reir', '.laugh',
+  '.dormir', '.sleep',
+  '.pensar', '.think',
+  '.guiñar', '.wink',
+  '.abrazar2', '.cuddle',
+  '.bofetada', '.slap',
+  '.patada', '.kick',
+  '.picar', '.poke',
+  '.cosquillas', '.tickle'
 ];
 
 export const help = `
 Envía GIFs de anime con acciones interactivas 🎭
 
 *Acciones disponibles:*
-  • \`.pegar\` / \`.golpear\` / \`.slap\` @usuario
+
+*Agresivas:* 👊
+  • \`.pegar\` / \`.slap\` @usuario
+  • \`.bofetada\` @usuario
+  • \`.patada\` / \`.kick\` @usuario
+  • \`.morder\` / \`.bite\` @usuario
+
+*Cariñosas:* 💕
   • \`.abrazar\` / \`.hug\` @usuario
   • \`.besar\` / \`.kiss\` @usuario
   • \`.acariciar\` / \`.pat\` @usuario
-  • \`.morder\` / \`.bite\` @usuario
-  • \`.abofetar\` / \`.cachetada\` @usuario
-  • \`.pellizcar\` @usuario
-  • \`.empujar\` @usuario
+  • \`.abrazar2\` / \`.cuddle\` @usuario
+  • \`.alimentar\` / \`.feed\` @usuario
+
+*Interactivas:* 🎪
+  • \`.picar\` / \`.poke\` @usuario
+  • \`.cosquillas\` / \`.tickle\` @usuario
+  • \`.saludar\` / \`.wave\` @usuario
+  • \`.bailar\` / \`.dance\` @usuario
+  • \`.guiñar\` / \`.wink\` @usuario
+
+*Emocionales:* 😊
+  • \`.sonrojar\` / \`.blush\`
+  • \`.sonreir\` / \`.smile\`
+  • \`.llorar\` / \`.cry\`
+  • \`.reir\` / \`.laugh\`
+  • \`.dormir\` / \`.sleep\`
+  • \`.pensar\` / \`.think\`
 
 *Uso:*
   Menciona a un usuario para realizar la acción
@@ -40,67 +69,90 @@ Envía GIFs de anime con acciones interactivas 🎭
   - \`.pegar @usuario\` - Le pega a alguien
   - \`.abrazar @usuario\` - Abraza a alguien
   - \`.besar @usuario\` - Besa a alguien
+  - \`.llorar\` - Llora (sin mención)
 
-*Nota:* Si no mencionas a nadie, la acción será genérica.
+*Nota:* Usa la API de Nekos.best - GIFs de alta calidad
 `;
 
-// Mapeo de comandos a términos de búsqueda en inglés para Tenor
+// Mapeo de comandos a endpoints de Nekos.best API
 const ACCIONES_MAP = {
-  '.pegar': 'anime punch',
-  '.golpear': 'anime punch',
-  '.slap': 'anime slap',
-  '.abrazar': 'anime hug',
-  '.hug': 'anime hug',
-  '.besar': 'anime kiss',
-  '.kiss': 'anime kiss',
-  '.acariciar': 'anime pat head',
-  '.pat': 'anime pat',
-  '.morder': 'anime bite',
-  '.bite': 'anime bite',
-  '.abofetar': 'anime slap',
-  '.abrazo': 'anime hug',
-  '.palmadita': 'anime pat',
-  '.cachetada': 'anime slap face',
-  '.pellizcar': 'anime pinch',
-  '.empujar': 'anime push'
+  '.pegar': 'slap',
+  '.slap': 'slap',
+  '.abrazar': 'hug',
+  '.hug': 'hug',
+  '.besar': 'kiss',
+  '.kiss': 'kiss',
+  '.acariciar': 'pat',
+  '.pat': 'pat',
+  '.morder': 'bite',
+  '.bite': 'bite',
+  '.alimentar': 'feed',
+  '.feed': 'feed',
+  '.sonrojar': 'blush',
+  '.blush': 'blush',
+  '.sonreir': 'smile',
+  '.smile': 'smile',
+  '.saludar': 'wave',
+  '.wave': 'wave',
+  '.bailar': 'dance',
+  '.dance': 'dance',
+  '.llorar': 'cry',
+  '.cry': 'cry',
+  '.reir': 'laugh',
+  '.laugh': 'laugh',
+  '.dormir': 'sleep',
+  '.sleep': 'sleep',
+  '.pensar': 'think',
+  '.think': 'think',
+  '.guiñar': 'wink',
+  '.wink': 'wink',
+  '.abrazar2': 'cuddle',
+  '.cuddle': 'cuddle',
+  '.bofetada': 'slap',
+  '.patada': 'kick',
+  '.kick': 'kick',
+  '.picar': 'poke',
+  '.poke': 'poke',
+  '.cosquillas': 'tickle',
+  '.tickle': 'tickle'
 };
 
 // Textos para cada acción
 const TEXTOS_ACCIONES = {
-  '.pegar': ['le pegó a', 'golpeó a', 'le dio un puñetazo a'],
-  '.golpear': ['golpeó a', 'le pegó a', 'atacó a'],
-  '.slap': ['abofeteó a', 'le dio una cachetada a', 'le pegó a'],
-  '.abrazar': ['abrazó a', 'le dio un abrazo a', 'está abrazando a'],
-  '.hug': ['abrazó a', 'le dio un abrazo a', 'está abrazando a'],
-  '.besar': ['besó a', 'le dio un beso a', 'está besando a'],
-  '.kiss': ['besó a', 'le dio un beso a', 'está besando a'],
-  '.acariciar': ['acarició a', 'le hizo cariños a', 'está mimando a'],
-  '.pat': ['le dio palmaditas a', 'acarició la cabeza de', 'mimó a'],
-  '.morder': ['mordió a', 'le dio un mordisco a', 'está mordiendo a'],
-  '.bite': ['mordió a', 'le dio un mordisco a', 'está mordiendo a'],
-  '.abofetar': ['abofeteó a', 'le dio una cachetada a', 'golpeó a'],
-  '.abrazo': ['abrazó a', 'le dio un abrazo a', 'está abrazando a'],
-  '.palmadita': ['le dio palmaditas a', 'acarició a', 'mimó a'],
-  '.cachetada': ['le dio una cachetada a', 'abofeteó a', 'golpeó a'],
-  '.pellizcar': ['pellizcó a', 'le dio un pellizco a', 'está pellizcando a'],
-  '.empujar': ['empujó a', 'le dio un empujón a', 'está empujando a']
+  'slap': ['le pegó a', 'abofeteó a', 'le dio una cachetada a'],
+  'hug': ['abrazó a', 'le dio un abrazo a', 'está abrazando a'],
+  'kiss': ['besó a', 'le dio un beso a', 'está besando a'],
+  'pat': ['acarició a', 'le hizo cariños a', 'le dio palmaditas a'],
+  'bite': ['mordió a', 'le dio un mordisco a', 'está mordiendo a'],
+  'feed': ['alimentó a', 'le dio de comer a', 'está alimentando a'],
+  'blush': ['se sonrojó', 'está sonrojado/a', 'se puso rojo/a'],
+  'smile': ['sonrió', 'está sonriendo', 'tiene una sonrisa'],
+  'wave': ['saludó a', 'le hizo señas a', 'está saludando a'],
+  'dance': ['bailó con', 'está bailando con', 'invitó a bailar a'],
+  'cry': ['está llorando', 'lloró', 'se puso a llorar'],
+  'laugh': ['se rió', 'está riendo', 'se carcajeó'],
+  'sleep': ['se durmió', 'está durmiendo', 'se fue a dormir'],
+  'think': ['está pensando', 'reflexionó', 'se puso a pensar'],
+  'wink': ['le guiñó el ojo a', 'le hizo un guiño a', 'guiñó a'],
+  'cuddle': ['acurrucó a', 'se acurrucó con', 'está mimando a'],
+  'kick': ['pateó a', 'le dio una patada a', 'golpeó con el pie a'],
+  'poke': ['picó a', 'le dio un toque a', 'está molestando a'],
+  'tickle': ['le hizo cosquillas a', 'está haciéndole cosquillas a', 'molestó a']
 };
 
-// Función para obtener GIF de Tenor
-async function obtenerGifTenor(searchTerm, apiKey) {
+// Función para obtener GIF de Nekos.best API
+async function obtenerGifNekos(action) {
   try {
-    const url = `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(searchTerm)}&key=${apiKey}&limit=20&media_filter=gif`;
+    const url = `https://nekos.best/api/v2/${action}`;
     const response = await axios.get(url, { timeout: 10000 });
 
     if (response.data && response.data.results && response.data.results.length > 0) {
-      // Seleccionar un GIF aleatorio de los resultados
-      const randomIndex = Math.floor(Math.random() * response.data.results.length);
-      const gif = response.data.results[randomIndex];
-      return gif.media_formats.gif.url;
+      // Nekos.best devuelve un array de resultados, tomamos el primero
+      return response.data.results[0].url;
     }
     return null;
   } catch (error) {
-    console.error('Error al obtener GIF de Tenor:', error.message);
+    console.error('Error al obtener GIF de Nekos.best:', error.message);
     return null;
   }
 }
@@ -111,56 +163,52 @@ export async function run(sock, m, { command }) {
   const senderName = senderId.split('@')[0];
 
   try {
-    const config = obtenerConfig();
-    const tenorApiKey = config.tenorApiKey;
-
-    if (!tenorApiKey) {
-      return await sock.sendMessage(chatId, {
-        text: '❌ No se ha configurado la API de Tenor. Contacta al administrador del bot.'
-      }, { quoted: m });
-    }
-
     // Obtener usuario mencionado
     const mentionedJid = m.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0];
     
-    // Obtener término de búsqueda para la acción
-    const searchTerm = ACCIONES_MAP[command] || 'anime action';
+    // Obtener acción de la API
+    const action = ACCIONES_MAP[command];
     
+    if (!action) {
+      return await sock.sendMessage(chatId, {
+        text: '❌ Acción no reconocida. Usa `.help acciones` para ver las acciones disponibles.'
+      }, { quoted: m });
+    }
+
     // Obtener textos posibles para la acción
-    const textosAccion = TEXTOS_ACCIONES[command] || ['realizó una acción con'];
+    const textosAccion = TEXTOS_ACCIONES[action] || ['realizó una acción con'];
     const textoAleatorio = textosAccion[Math.floor(Math.random() * textosAccion.length)];
 
     // Construir mensaje
     let mensaje = '';
     let mentions = [senderId];
 
-    if (mentionedJid) {
+    // Acciones que no requieren mención (emocionales)
+    const accionesSinMencion = ['blush', 'smile', 'cry', 'laugh', 'sleep', 'think'];
+
+    if (mentionedJid && !accionesSinMencion.includes(action)) {
       const targetName = mentionedJid.split('@')[0];
       mensaje = `*@${senderName}* ${textoAleatorio} *@${targetName}*! 💫`;
       mentions.push(mentionedJid);
     } else {
-      // Si no hay mención, mensaje genérico
-      const accionNombre = command.slice(1); // Quitar el punto
-      mensaje = `*@${senderName}* está ${accionNombre === 'pegar' ? 'pegando' : accionNombre === 'abrazar' ? 'abrazando' : accionNombre === 'besar' ? 'besando' : 'realizando una acción'}! 💫`;
+      // Mensaje sin mención
+      mensaje = `*@${senderName}* ${textoAleatorio}! 💫`;
     }
 
     // Buscar GIF
-    await sock.sendMessage(chatId, {
-      text: `🔍 Buscando el GIF perfecto...`
-    }, { quoted: m });
-
-    const gifUrl = await obtenerGifTenor(searchTerm, tenorApiKey);
+    const gifUrl = await obtenerGifNekos(action);
 
     if (!gifUrl) {
       return await sock.sendMessage(chatId, {
-        text: `❌ No se pudo encontrar un GIF para esta acción. Intenta nuevamente.`
+        text: `❌ No se pudo obtener el GIF. Intenta nuevamente o usa otra acción.`
       }, { quoted: m });
     }
 
     // Descargar el GIF
     const gifResponse = await axios.get(gifUrl, {
       responseType: 'arraybuffer',
-      timeout: 30000
+      timeout: 30000,
+      maxContentLength: 50 * 1024 * 1024 // 50 MB máximo
     });
 
     const buffer = Buffer.from(gifResponse.data);
@@ -175,8 +223,15 @@ export async function run(sock, m, { command }) {
 
   } catch (error) {
     console.error('Error en comando de acción:', error);
-    await sock.sendMessage(chatId, {
-      text: '❌ Ocurrió un error al procesar la acción. Intenta nuevamente.'
-    }, { quoted: m });
+    
+    let errorMsg = '❌ Ocurrió un error al procesar la acción.';
+    
+    if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+      errorMsg += '\n⏱️ Tiempo de espera agotado. Intenta nuevamente.';
+    } else if (error.response && error.response.status === 404) {
+      errorMsg += '\n🔍 Acción no disponible en este momento.';
+    }
+    
+    await sock.sendMessage(chatId, { text: errorMsg }, { quoted: m });
   }
 }
