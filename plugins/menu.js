@@ -5,49 +5,66 @@ export const command = '.menu';
 export async function run(sock, m) {
   const chatId = (m && m.key && m.key.remoteJid) ? m.key.remoteJid : (m.chat || m.from || '');
 
-  const menu =  `
+  const menu = `
 ╭─⬣「 *HINATA-BOT* 」⬣─╮
 │
 │  ¡Hola, {userName}! 👋
 │  Soy Hinata, tu asistente virtual.
 │  Aquí tienes mi lista de comandos:
 │
-├─⬣「 *MÚSICA Y VIDEO* 🎵 」
-│  │
-│  ├─ *.play* <canción>
-│  │  └ _Reproduce una canción de YouTube._
-│  │
-│  └─ *.yt* <video>
-│     └ _Busca y descarga un video._
-│
 ├─⬣「 *BÚSQUEDAS* 🔍 」
 │  │
 │  ├─ *.google* <texto>
-│  │  └ _Busca información en Google._
+│  │  └ _Busca en Google._
 │  │
-│  └─ *.letra* <canción>
-│     └ _Encuentra la letra de una canción._
+│  ├─ *.anime* <nombre>
+│  │  └ _Busca información de un anime._
+│  │
+│  ├─ *.pinterest* <texto>
+│  │  └ _Busca imágenes en Pinterest._
+│  │
+│  └─ *.papel* <texto>
+│     └ _Busca un fondo de pantalla._
 │
-├─⬣「 *DIVERSIÓN* ✨ 」
+├─⬣「 *MULTIMEDIA* 🖼️ 」
+│  │
+│  ├─ *.musica* <canción>
+│  │  └ _Descarga una canción._
 │  │
 │  ├─ *.sticker*
-│  │  └ _Convierte una imagen en sticker._
+│  │  └ _Crea un sticker de imagen/video._
 │  │
-│  └─ *.meme*
-│     └ _Genera un meme al azar._
+│  └─ *.gif* <texto>
+│     └ _Busca un GIF animado._
+│
+├─⬣「 *JUEGOS* 🎮 」
+│  │
+│  ├─ *.juegos*
+│  │  └ _Muestra el menú de juegos._
+│  │
+│  ├─ *.adivina* | *.ahorcado*
+│  │
+│  └─ *.slot* | *.ppt* | *.trivia*
 │
 ├─⬣「 *GRUPOS* 🛡️ 」
 │  │
-│  ├─ *.add* <número>
-│  │  └ _Añade un miembro al grupo._
+│  ├─ *.kick* <@usuario>
+│  │  └ _Elimina a un miembro._
 │  │
-│  └─ *.kick* <@usuario>
-│     └ _Elimina a un miembro del grupo._
+│  └─ *.inactivos* [días]
+│     └ _Muestra inactivos del grupo._
 │
+├─⬣「 *BOT ADMIN* ⚙️ 」
+│  │
+│  ├─ *.reload* | *.updateplugins*
+│  │  └ _Recarga los plugins del bot._
+│  │
+│  └─ *.cmd* <on|off> <comando>
+│     └ _Activa/desactiva comandos._
 │
 │  💡 _Usa .help <comando> para más detalles._
 │
-╰─⬣「 Creado por *Tu Nombre* 」⬣─╯
+╰─⬣「 Creado por *Nicolas_sanilo* 」⬣─╯
 `;
 
   const imgPath = './media/menu.jpg';
