@@ -4,7 +4,7 @@
  * @version 1.0.0
  */
 
-import { db } from './db.js';
+import { db } from '../db.js';
 
 export const command = '.inactivos';
 
