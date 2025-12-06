@@ -109,6 +109,11 @@ export async function run(sock, m) {
 │  ├─ *.completarmision*
 │  │  └ _Completa tu misión y cobra._
 │  │
+│  ├─ *.robar* @usuario
+│  │  └ _Intenta robar saldo a otro usuario._
+│  │  └ _50% éxito, 50% fallo con multa._
+│  │  └ _Cooldown: 2 horas._
+│  │
 │  └─ *.ranking* | *.top* [número]
 │     └ _Ranking de saldos del grupo._
 │     └ _Ver quién tiene más puntos._

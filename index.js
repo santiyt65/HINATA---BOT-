@@ -194,6 +194,44 @@ async function connectToWhatsApp() {
         const text = msg.message?.conversation || msg.message?.extendedTextMessage?.text || '';
         const prefix = '.'; // Prefijo para los comandos
 
+        // Verificar si hay un juego activo y el mensaje es un número o letra
+        if (!text.startsWith(prefix)) {
+            const contenido = text.trim();
+            
+            try {
+                // Verificar si es un número
+                if (/^\d+$/.test(contenido)) {
+                    // Verificar si es para trivia (1-4)
+                    if (/^[1-4]$/.test(contenido)) {
+                        const triviaPlugin = plugins.get('.trivia');
+                        if (triviaPlugin && triviaPlugin.procesarMensajeTrivia) {
+                            await triviaPlugin.procesarMensajeTrivia(sock, msg);
+                            return;
+                        }
+                    }
+                    
+                    // Si no es trivia, verificar si es para adivina
+                    const adivinaPlugin = plugins.get('.adivina');
+                    if (adivinaPlugin && adivinaPlugin.procesarMensajeNumero) {
+                        await adivinaPlugin.procesarMensajeNumero(sock, msg);
+                        return;
+                    }
+                }
+                
+                // Verificar si es una sola letra para ahorcado
+                if (contenido.length === 1 && /\p{L}/u.test(contenido)) {
+                    const ahorcadoPlugin = plugins.get('.ahorcado');
+                    if (ahorcadoPlugin && ahorcadoPlugin.procesarMensajeAhorcado) {
+                        await ahorcadoPlugin.procesarMensajeAhorcado(sock, msg);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error('Error al procesar mensaje para juegos:', err);
+            }
+            return;
+        }
+
         if (!text.startsWith(prefix)) return;
 
         const senderId = msg.key.remoteJid;

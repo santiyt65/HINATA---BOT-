@@ -28,6 +28,7 @@ export async function initDB() {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 chatId TEXT UNIQUE NOT NULL,
                 saldo INTEGER DEFAULT 100,
+                banco INTEGER DEFAULT 0,
                 banned INTEGER DEFAULT 0,
                 createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
             );
