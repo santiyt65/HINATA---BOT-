@@ -99,6 +99,12 @@ export async function run(sock, m) {
 │  ├─ *.saldo*
 │  │  └ _Consulta tu saldo de puntos._
 │  │
+│  ├─ *.depositar* <cantidad>
+│  │  └ _Deposita puntos en tu banco._
+│  │
+│  ├─ *.retirar* <cantidad>
+│  │  └ _Retira puntos de tu banco._
+│  │
 │  ├─ *.apostar* <cantidad>
 │  │  └ _Apuesta tus puntos._
 │  │
