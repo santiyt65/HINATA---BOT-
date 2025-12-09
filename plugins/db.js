@@ -62,6 +62,11 @@ export async function initDB() {
                 lastSeen DATETIME DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (chatId, userId)
             );
+
+            CREATE TABLE IF NOT EXISTS claimed_characters (
+                character_id INTEGER PRIMARY KEY,
+                user_id TEXT NOT NULL
+            );
         `);
 
         console.log('✅ Base de datos inicializada correctamente.');
