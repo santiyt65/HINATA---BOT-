@@ -4,6 +4,7 @@
  */
 
 import axios from 'axios';
+import yts from 'yt-search';
 import { obtenerConfig } from '../lib/functions.js';
 
 export const command = '.musica';
@@ -31,23 +32,32 @@ Descarga y envía música desde YouTube, SoundCloud y otras plataformas en difer
   YouTube, SoundCloud, Twitter, TikTok, y más.
 `;
 
-// Función para buscar en YouTube usando la API de búsqueda de Google (si está disponible)
+// Función para buscar en YouTube
 async function buscarEnYouTube(query) {
   try {
     const config = obtenerConfig();
     
-    // Si hay API key de Google, usar búsqueda personalizada
+    // Si hay API key de Google, usar búsqueda personalizada (mantenemos esta lógica)
     if (config.googleSearchApiKey && config.googleCseId) {
       const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${config.googleSearchApiKey}&cx=${config.googleCseId}&q=${encodeURIComponent(query + ' site:youtube.com')}`;
       const response = await axios.get(searchUrl);
       
       if (response.data.items && response.data.items.length > 0) {
-        return response.data.items[0].link;
+        // Asegurarnos de que el link sea un video de YouTube válido
+        const link = response.data.items[0].link;
+        if (link.includes('youtube.com/watch')) {
+          return link;
+        }
       }
     }
     
-    // Fallback: construir URL de búsqueda de YouTube
-    return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+    // Fallback: usar yt-search para encontrar el primer video
+    const searchResult = await yts(query);
+    if (searchResult.videos && searchResult.videos.length > 0) {
+      return searchResult.videos[0].url;
+    }
+
+    return null; // Si no se encuentra nada
   } catch (err) {
     console.error('Error en búsqueda de YouTube:', err);
     return null;
