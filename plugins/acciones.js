@@ -1,7 +1,7 @@
 /**
  * @file Plugin Acciones - Envía GIFs de anime con acciones interactivas
- * @version 2.0.0
- * @description Usa la API de Nekos.best para GIFs de anime de alta calidad
+ * @version 3.0.0
+ * @description Usa la API de OtakuGIFs para GIFs de anime de alta calidad
  */
 
 import axios from 'axios';
@@ -26,7 +26,8 @@ export const command = [
   '.bofetada', '.slap',
   '.patada', '.kick',
   '.picar', '.poke',
-  '.cosquillas', '.tickle'
+  '.cosquillas', '.tickle',
+  '.punch'
 ];
 
 export const help = `
@@ -35,49 +36,51 @@ Envía GIFs de anime con acciones interactivas 🎭
 *Acciones disponibles:*
 
 *Agresivas:* 👊
-  • \`.pegar\` / \`.slap\` @usuario
-  • \`.bofetada\` @usuario
-  • \`.patada\` / \`.kick\` @usuario
-  • \`.morder\` / \`.bite\` @usuario
+  • ".pegar" / ".punch" @usuario
+  • ".bofetada" / ".slap" @usuario
+  • ".patada" / ".kick" @usuario (Usa 'punch' como alternativa)
+  • ".morder" / ".bite" @usuario
 
 *Cariñosas:* 💕
-  • \`.abrazar\` / \`.hug\` @usuario
-  • \`.besar\` / \`.kiss\` @usuario
-  • \`.acariciar\` / \`.pat\` @usuario
-  • \`.abrazar2\` / \`.cuddle\` @usuario
-  • \`.alimentar\` / \`.feed\` @usuario
+  • ".abrazar" / ".hug" @usuario
+  • ".besar" / ".kiss" @usuario
+  • ".acariciar" / ".pat" @usuario
+  • ".abrazar2" / ".cuddle" @usuario
+  • ".alimentar" / ".feed" @usuario
 
 *Interactivas:* 🎪
-  • \`.picar\` / \`.poke\` @usuario
-  • \`.cosquillas\` / \`.tickle\` @usuario
-  • \`.saludar\` / \`.wave\` @usuario
-  • \`.bailar\` / \`.dance\` @usuario
-  • \`.guiñar\` / \`.wink\` @usuario
+  • ".picar" / ".poke" @usuario
+  • ".cosquillas" / ".tickle" @usuario
+  • ".saludar" / ".wave" @usuario
+  • ".bailar" / ".dance" @usuario
+  • ".guiñar" / ".wink" @usuario
 
 *Emocionales:* 😊
-  • \`.sonrojar\` / \`.blush\`
-  • \`.sonreir\` / \`.smile\`
-  • \`.llorar\` / \`.cry\`
-  • \`.reir\` / \`.laugh\`
-  • \`.dormir\` / \`.sleep\`
-  • \`.pensar\` / \`.think\`
+  • ".sonrojar" / ".blush"
+  • ".sonreir" / ".smile"
+  • ".llorar" / ".cry"
+  • ".reir" / ".laugh"
+  • ".dormir" / ".sleep"
+  • ".pensar" / ".think"
 
 *Uso:*
   Menciona a un usuario para realizar la acción
   
 *Ejemplos:*
-  - \`.pegar @usuario\` - Le pega a alguien
-  - \`.abrazar @usuario\` - Abraza a alguien
-  - \`.besar @usuario\` - Besa a alguien
-  - \`.llorar\` - Llora (sin mención)
+  - ".pegar @usuario" - Le pega a alguien
+  - ".abrazar @usuario" - Abraza a alguien
+  - ".besar @usuario" - Besa a alguien
+  - ".llorar" - Llora (sin mención)
 
-*Nota:* Usa la API de Nekos.best - GIFs de alta calidad
+*Nota:* Usa la API de OtakuGIFs - GIFs de alta calidad
 `;
 
-// Mapeo de comandos a endpoints de Nekos.best API
+// Mapeo de comandos a endpoints de OtakuGIFs API
 const ACCIONES_MAP = {
-  '.pegar': 'slap',
+  '.pegar': 'punch',
+  '.punch': 'punch',
   '.slap': 'slap',
+  '.bofetada': 'slap',
   '.abrazar': 'hug',
   '.hug': 'hug',
   '.besar': 'kiss',
@@ -86,8 +89,8 @@ const ACCIONES_MAP = {
   '.pat': 'pat',
   '.morder': 'bite',
   '.bite': 'bite',
-  '.alimentar': 'feed',
-  '.feed': 'feed',
+  '.alimentar': 'nom', // 'nom' es lo más cercano a 'feed'
+  '.feed': 'nom',
   '.sonrojar': 'blush',
   '.blush': 'blush',
   '.sonreir': 'smile',
@@ -102,15 +105,14 @@ const ACCIONES_MAP = {
   '.laugh': 'laugh',
   '.dormir': 'sleep',
   '.sleep': 'sleep',
-  '.pensar': 'think',
-  '.think': 'think',
+  '.pensar': 'confused', // 'confused' es lo más cercano a 'think'
+  '.think': 'confused',
   '.guiñar': 'wink',
   '.wink': 'wink',
   '.abrazar2': 'cuddle',
   '.cuddle': 'cuddle',
-  '.bofetada': 'slap',
-  '.patada': 'kick',
-  '.kick': 'kick',
+  '.patada': 'punch', // No hay 'kick', se usa 'punch'
+  '.kick': 'punch',
   '.picar': 'poke',
   '.poke': 'poke',
   '.cosquillas': 'tickle',
@@ -119,12 +121,13 @@ const ACCIONES_MAP = {
 
 // Textos para cada acción
 const TEXTOS_ACCIONES = {
-  'slap': ['le pegó a', 'abofeteó a', 'le dio una cachetada a'],
+  'punch': ['le pegó a', 'le dio un puñetazo a', 'golpeó a'],
+  'slap': ['abofeteó a', 'le dio una cachetada a'],
   'hug': ['abrazó a', 'le dio un abrazo a', 'está abrazando a'],
   'kiss': ['besó a', 'le dio un beso a', 'está besando a'],
   'pat': ['acarició a', 'le hizo cariños a', 'le dio palmaditas a'],
   'bite': ['mordió a', 'le dio un mordisco a', 'está mordiendo a'],
-  'feed': ['alimentó a', 'le dio de comer a', 'está alimentando a'],
+  'nom': ['alimentó a', 'le dio de comer a', 'está alimentando a'],
   'blush': ['se sonrojó', 'está sonrojado/a', 'se puso rojo/a'],
   'smile': ['sonrió', 'está sonriendo', 'tiene una sonrisa'],
   'wave': ['saludó a', 'le hizo señas a', 'está saludando a'],
@@ -132,27 +135,25 @@ const TEXTOS_ACCIONES = {
   'cry': ['está llorando', 'lloró', 'se puso a llorar'],
   'laugh': ['se rió', 'está riendo', 'se carcajeó'],
   'sleep': ['se durmió', 'está durmiendo', 'se fue a dormir'],
-  'think': ['está pensando', 'reflexionó', 'se puso a pensar'],
+  'confused': ['está pensando', 'reflexionó', 'se puso a pensar'],
   'wink': ['le guiñó el ojo a', 'le hizo un guiño a', 'guiñó a'],
   'cuddle': ['acurrucó a', 'se acurrucó con', 'está mimando a'],
-  'kick': ['pateó a', 'le dio una patada a', 'golpeó con el pie a'],
   'poke': ['picó a', 'le dio un toque a', 'está molestando a'],
   'tickle': ['le hizo cosquillas a', 'está haciéndole cosquillas a', 'molestó a']
 };
 
-// Función para obtener GIF de Nekos.best API
-async function obtenerGifNekos(action) {
+// Función para obtener GIF de OtakuGIFs API
+async function obtenerGif(action) {
   try {
-    const url = `https://nekos.best/api/v2/${action}`;
+    const url = `https://api.otakugifs.xyz/gif?reaction=${action}`;
     const response = await axios.get(url, { timeout: 10000 });
 
-    if (response.data && response.data.results && response.data.results.length > 0) {
-      // Nekos.best devuelve un array de resultados, tomamos el primero
-      return response.data.results[0].url;
+    if (response.data && response.data.url) {
+      return response.data.url;
     }
     return null;
   } catch (error) {
-    console.error('Error al obtener GIF de Nekos.best:', error.message);
+    console.error('Error al obtener GIF de OtakuGIFs:', error.message);
     return null;
   }
 }
@@ -184,7 +185,7 @@ export async function run(sock, m, { command }) {
     let mentions = [senderId];
 
     // Acciones que no requieren mención (emocionales)
-    const accionesSinMencion = ['blush', 'smile', 'cry', 'laugh', 'sleep', 'think'];
+    const accionesSinMencion = ['blush', 'smile', 'cry', 'laugh', 'sleep', 'confused'];
 
     if (mentionedJid && !accionesSinMencion.includes(action)) {
       const targetName = mentionedJid.split('@')[0];
@@ -196,7 +197,7 @@ export async function run(sock, m, { command }) {
     }
 
     // Buscar GIF
-    const gifUrl = await obtenerGifNekos(action);
+    const gifUrl = await obtenerGif(action);
 
     if (!gifUrl) {
       return await sock.sendMessage(chatId, {
